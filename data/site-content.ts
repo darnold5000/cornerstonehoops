@@ -51,7 +51,7 @@ export const siteContent = {
     facebook: "",
   },
   announcement: {
-    active: true,
+    active: false,
     text: "NOW BOOKING • July 15 Training Sessions • Spots Available",
     href: "/schedule",
   },
