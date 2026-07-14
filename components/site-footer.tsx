@@ -130,14 +130,19 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {siteContent.businessName}. All rights
             reserved.
           </p>
-          <a
-            href={siteContent.websiteCredit.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-brand-accent"
-          >
-            {siteContent.websiteCredit.label}
-          </a>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link href="/admin/login" className="hover:text-brand-accent">
+              Staff login
+            </Link>
+            <a
+              href={siteContent.websiteCredit.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-brand-accent"
+            >
+              {siteContent.websiteCredit.label}
+            </a>
+          </div>
         </div>
       </div>
     </footer>
