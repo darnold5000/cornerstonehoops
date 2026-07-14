@@ -1,14 +1,13 @@
-import { AdminShell } from "@/components/admin/admin-shell";
 import { requireAdmin } from "@/lib/auth";
 import { getPrograms } from "@/lib/data";
 import { ageRangeLabel, formatPrice } from "@/lib/format";
 
 export default async function AdminProgramsPage() {
-  const profile = await requireAdmin();
+  await requireAdmin();
   const programs = await getPrograms();
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="space-y-6">
         <div>
           <h2 className="font-heading text-3xl tracking-wide">Programs</h2>
@@ -40,6 +39,6 @@ export default async function AdminProgramsPage() {
           ))}
         </div>
       </div>
-    </AdminShell>
+    </>
   );
 }

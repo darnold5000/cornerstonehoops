@@ -1,4 +1,3 @@
-import { AdminShell } from "@/components/admin/admin-shell";
 import { ReviewCreateForm } from "@/components/admin/review-create-form";
 import { Badge } from "@/components/ui/badge";
 import { requireAdmin } from "@/lib/auth";
@@ -10,7 +9,7 @@ import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import type { Review } from "@/lib/types/database";
 
 export default async function AdminReviewsPage() {
-  const profile = await requireAdmin();
+  await requireAdmin();
   let reviews: Review[] = [];
 
   if (isSupabaseConfigured() && process.env.SUPABASE_SERVICE_ROLE_KEY) {
@@ -27,7 +26,7 @@ export default async function AdminReviewsPage() {
   }
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="space-y-8">
         <div>
           <h2 className="font-heading text-3xl tracking-wide">Reviews</h2>
@@ -62,6 +61,6 @@ export default async function AdminReviewsPage() {
           )}
         </div>
       </div>
-    </AdminShell>
+    </>
   );
 }

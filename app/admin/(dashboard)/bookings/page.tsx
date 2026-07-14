@@ -1,5 +1,3 @@
-import { AdminShell } from "@/components/admin/admin-shell";
-import { requireStaff } from "@/lib/auth";
 import { getAdminSessions } from "@/lib/admin-data";
 import {
   createServiceClient,
@@ -10,7 +8,6 @@ import { formatSessionDateShort, formatSessionTime } from "@/lib/format";
 import type { Booking } from "@/lib/types/database";
 
 export default async function AdminBookingsPage() {
-  const profile = await requireStaff();
   const sessions = await getAdminSessions();
   const sessionMap = Object.fromEntries(sessions.map((s) => [s.id, s]));
 
@@ -30,7 +27,7 @@ export default async function AdminBookingsPage() {
   }
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="space-y-6">
         <div>
           <h2 className="font-heading text-3xl tracking-wide">Bookings</h2>
@@ -72,6 +69,6 @@ export default async function AdminBookingsPage() {
           </div>
         )}
       </div>
-    </AdminShell>
+    </>
   );
 }

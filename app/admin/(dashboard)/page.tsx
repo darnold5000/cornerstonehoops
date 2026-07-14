@@ -1,12 +1,9 @@
 import Link from "next/link";
-import { AdminShell } from "@/components/admin/admin-shell";
 import { Button } from "@/components/ui/button";
-import { requireStaff } from "@/lib/auth";
 import { getDashboardMetrics } from "@/lib/admin-data";
 import { formatSessionTime } from "@/lib/format";
 
 export default async function AdminDashboardPage() {
-  const profile = await requireStaff();
   const metrics = await getDashboardMetrics();
 
   const cards = [
@@ -19,7 +16,7 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="space-y-8">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -83,6 +80,6 @@ export default async function AdminDashboardPage() {
           </div>
         </section>
       </div>
-    </AdminShell>
+    </>
   );
 }

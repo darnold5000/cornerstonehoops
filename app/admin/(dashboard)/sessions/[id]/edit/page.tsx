@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { AdminShell } from "@/components/admin/admin-shell";
 import { SessionForm } from "@/components/admin/session-form";
 import { requireAdmin } from "@/lib/auth";
 import { getAdminSessions } from "@/lib/admin-data";
@@ -10,7 +9,7 @@ export default async function EditSessionPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const profile = await requireAdmin();
+  await requireAdmin();
   const { id } = await params;
   const [sessions, programs, sessionTypes, trainers] = await Promise.all([
     getAdminSessions(),
@@ -22,7 +21,7 @@ export default async function EditSessionPage({
   if (!session) notFound();
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
           <h2 className="font-heading text-3xl tracking-wide">Edit session</h2>
@@ -55,6 +54,6 @@ export default async function EditSessionPage({
           }}
         />
       </div>
-    </AdminShell>
+    </>
   );
 }

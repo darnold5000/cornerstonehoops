@@ -1,14 +1,13 @@
-import { AdminShell } from "@/components/admin/admin-shell";
 import { SettingsForm } from "@/components/admin/settings-form";
 import { requireAdmin } from "@/lib/auth";
 import { getBusinessSettings } from "@/lib/data";
 
 export default async function AdminSettingsPage() {
-  const profile = await requireAdmin();
+  await requireAdmin();
   const settings = await getBusinessSettings();
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
           <h2 className="font-heading text-3xl tracking-wide">
@@ -20,6 +19,6 @@ export default async function AdminSettingsPage() {
         </div>
         <SettingsForm settings={settings} />
       </div>
-    </AdminShell>
+    </>
   );
 }

@@ -1,13 +1,12 @@
-import { AdminShell } from "@/components/admin/admin-shell";
 import { requireAdmin } from "@/lib/auth";
 import { getTrainers } from "@/lib/data";
 
 export default async function AdminTrainersPage() {
-  const profile = await requireAdmin();
+  await requireAdmin();
   const trainers = await getTrainers();
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="space-y-6">
         <div>
           <h2 className="font-heading text-3xl tracking-wide">Trainers</h2>
@@ -31,6 +30,6 @@ export default async function AdminTrainersPage() {
           ))}
         </div>
       </div>
-    </AdminShell>
+    </>
   );
 }

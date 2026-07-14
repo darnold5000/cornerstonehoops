@@ -1,14 +1,13 @@
-import { AdminShell } from "@/components/admin/admin-shell";
 import { AvailabilityTool } from "@/components/admin/availability-tool";
 import { requireAdmin } from "@/lib/auth";
 import { getTrainers } from "@/lib/data";
 
 export default async function AvailabilityPage() {
-  const profile = await requireAdmin();
+  await requireAdmin();
   const trainers = await getTrainers();
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="space-y-6">
         <div>
           <h2 className="font-heading text-3xl tracking-wide">
@@ -20,6 +19,6 @@ export default async function AvailabilityPage() {
         </div>
         <AvailabilityTool trainers={trainers} />
       </div>
-    </AdminShell>
+    </>
   );
 }

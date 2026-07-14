@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   CalendarDays,
   ClipboardList,
@@ -30,6 +31,10 @@ const NAV = [
   { href: "/admin/settings", label: "Settings", icon: Settings, adminOnly: true },
 ];
 
+function isNavActive(pathname: string, href: string) {
+  return href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+}
+
 export function AdminShell({
   children,
   profile,
@@ -38,6 +43,13 @@ export function AdminShell({
   profile: Profile;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
 
   async function handleLogout() {
     try {
@@ -73,19 +85,38 @@ export function AdminShell({
           {NAV.filter(
             (item) => !item.adminOnly || isAdminRole(profile.role),
           ).map((item) => {
-            const active =
-              item.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(item.href);
+            const active = pendingHref
+              ? isNavActive(pendingHref, item.href)
+              : isNavActive(pathname, item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch
+                aria-current={active ? "page" : undefined}
+                onClick={(e) => {
+                  if (
+                    e.metaKey ||
+                    e.ctrlKey ||
+                    e.shiftKey ||
+                    e.altKey ||
+                    e.button !== 0
+                  ) {
+                    return;
+                  }
+                  e.preventDefault();
+                  if (isNavActive(pathname, item.href) && !pendingHref) return;
+                  setPendingHref(item.href);
+                  startTransition(() => {
+                    router.push(item.href);
+                  });
+                }}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap",
+                  "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold whitespace-nowrap transition-opacity",
                   active
-                    ? "bg-brand-dark text-white"
-                    : "bg-muted text-foreground hover:bg-muted/80",
+                    ? "bg-[#0a0a0a] text-white shadow-sm"
+                    : "bg-[#e6dcc6] text-[#1a1a1a] hover:bg-[#d9ceb4]",
+                  isPending && pendingHref === item.href && "opacity-80",
                 )}
               >
                 <item.icon className="h-4 w-4" />

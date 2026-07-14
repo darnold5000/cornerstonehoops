@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
@@ -14,7 +15,7 @@ export async function getCurrentUser() {
   return user;
 }
 
-export async function getCurrentProfile(): Promise<Profile | null> {
+export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
   if (!isSupabaseConfigured()) {
     return {
       id: "demo-owner",
@@ -42,7 +43,7 @@ export async function getCurrentProfile(): Promise<Profile | null> {
     .single();
 
   return (data as Profile) ?? null;
-}
+});
 
 export async function requireStaff(): Promise<Profile> {
   const profile = await getCurrentProfile();

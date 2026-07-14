@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AdminShell } from "@/components/admin/admin-shell";
 import { Button } from "@/components/ui/button";
-import { requireStaff } from "@/lib/auth";
 import { getSessionRoster } from "@/lib/admin-data";
 import { athleteAgeFromDob, formatSessionDate, formatSessionTime } from "@/lib/format";
 
@@ -11,7 +9,6 @@ export default async function RosterPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const profile = await requireStaff();
   const { id } = await params;
   const { session, bookings } = await getSessionRoster(id);
   if (!session) notFound();
@@ -47,7 +44,7 @@ export default async function RosterPage({
   const csvHref = `data:text/csv;charset=utf-8,${encodeURIComponent(csvRows.join("\n"))}`;
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -114,6 +111,6 @@ export default async function RosterPage({
           </div>
         )}
       </div>
-    </AdminShell>
+    </>
   );
 }

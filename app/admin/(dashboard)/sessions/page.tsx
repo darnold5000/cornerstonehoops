@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { AdminShell } from "@/components/admin/admin-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { requireStaff } from "@/lib/auth";
 import { getAdminSessions } from "@/lib/admin-data";
 import {
   formatPrice,
@@ -11,11 +9,10 @@ import {
 } from "@/lib/format";
 
 export default async function AdminSessionsPage() {
-  const profile = await requireStaff();
   const sessions = await getAdminSessions();
 
   return (
-    <AdminShell profile={profile}>
+    <>
       <div className="space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -66,6 +63,6 @@ export default async function AdminSessionsPage() {
           ))}
         </div>
       </div>
-    </AdminShell>
+    </>
   );
 }
