@@ -17,7 +17,7 @@ export type SavedFamily = {
   updatedAt: string;
 };
 
-const STORAGE_KEY = "ch_returning_family";
+const STORAGE_KEY = "choops_returning_family";
 
 export function loadSavedFamily(): SavedFamily | null {
   if (typeof window === "undefined") return null;

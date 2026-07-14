@@ -5,7 +5,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import { formatSessionDateShort, formatSessionTime } from "@/lib/format";
 import type { Booking } from "@/lib/types/database";
 
@@ -19,7 +19,7 @@ export default async function AdminBookingsPage() {
     try {
       const supabase = createServiceClient();
       const { data } = await supabase
-        .from(CH_TABLES.bookings)
+        .from(CHOOPS_TABLES.bookings)
         .select("*")
         .order("booked_at", { ascending: false })
         .limit(100);

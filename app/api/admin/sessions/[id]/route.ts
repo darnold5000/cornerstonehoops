@@ -5,7 +5,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import { sessionFormSchema } from "@/lib/sessions";
 
 export async function PATCH(
@@ -31,7 +31,7 @@ export async function PATCH(
 
     const supabase = createServiceClient();
     const { error } = await supabase
-      .from(CH_TABLES.sessions)
+      .from(CHOOPS_TABLES.sessions)
       .update({
         title: parsed.title,
         program_id: parsed.program_id || null,

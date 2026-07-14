@@ -4,7 +4,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import type { PaymentRequirement, SessionStatus } from "@/lib/types/database";
 
 export const sessionFormSchema = z.object({
@@ -122,7 +122,7 @@ export async function createSessionsFromForm(
   }));
 
   const { data, error } = await supabase
-    .from(CH_TABLES.sessions)
+    .from(CHOOPS_TABLES.sessions)
     .insert(rows)
     .select("id");
 
@@ -143,7 +143,7 @@ export async function updateSessionStatus(
 
   const supabase = createServiceClient();
   const { error } = await supabase
-    .from(CH_TABLES.sessions)
+    .from(CHOOPS_TABLES.sessions)
     .update({
       status,
       published_at:

@@ -7,7 +7,7 @@ This project is **not affiliated with cornerstonehoops.com**.
 ## Stack
 
 - Next.js 16 (App Router) + TypeScript + Tailwind CSS
-- Supabase (Postgres, Auth, RLS) with `ch_*` table prefixes
+- Supabase (Postgres, Auth, RLS) with `choops_*` table prefixes
 - Resend for booking emails
 - Pay at facility (Venmo / Zelle); Stripe stubs reserved for later
 
@@ -29,10 +29,10 @@ Without Supabase env vars the public site and admin UI run in **demo mode** usin
 2. Run [`supabase/migrations/001_initial.sql`](supabase/migrations/001_initial.sql).
 3. Run [`supabase/seed.sql`](supabase/seed.sql).
 4. Create an Auth user in Supabase (invitation only — no public signup).
-5. Insert a matching `ch_profiles` row:
+5. Insert a matching `choops_profiles` row:
 
 ```sql
-insert into public.ch_profiles (id, full_name, email, role, active)
+insert into public.choops_profiles (id, full_name, email, role, active)
 values ('<auth-user-uuid>', 'Owner Name', 'owner@email.com', 'owner', true);
 ```
 

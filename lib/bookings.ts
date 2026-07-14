@@ -3,7 +3,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import { generateConfirmationNumber } from "@/lib/format";
 import type { Booking } from "@/lib/types/database";
 import {
@@ -87,7 +87,7 @@ export async function createPublicBooking(
   const supabase = createServiceClient();
 
   const { data: session, error: sessionError } = await supabase
-    .from(CH_TABLES.sessions)
+    .from(CHOOPS_TABLES.sessions)
     .select("*")
     .eq("id", input.sessionId)
     .maybeSingle();
@@ -107,7 +107,7 @@ export async function createPublicBooking(
   // Upsert-ish parent by email
   let parentId: string;
   const { data: existingParent } = await supabase
-    .from(CH_TABLES.parents)
+    .from(CHOOPS_TABLES.parents)
     .select("id")
     .ilike("email", input.parentEmail)
     .maybeSingle();
@@ -115,7 +115,7 @@ export async function createPublicBooking(
   if (existingParent) {
     parentId = existingParent.id;
     await supabase
-      .from(CH_TABLES.parents)
+      .from(CHOOPS_TABLES.parents)
       .update({
         first_name: input.parentFirstName,
         last_name: input.parentLastName,
@@ -124,7 +124,7 @@ export async function createPublicBooking(
       .eq("id", parentId);
   } else {
     const { data: parent, error: parentError } = await supabase
-      .from(CH_TABLES.parents)
+      .from(CHOOPS_TABLES.parents)
       .insert({
         first_name: input.parentFirstName,
         last_name: input.parentLastName,
@@ -140,7 +140,7 @@ export async function createPublicBooking(
   }
 
   const { data: athlete, error: athleteError } = await supabase
-    .from(CH_TABLES.athletes)
+    .from(CHOOPS_TABLES.athletes)
     .insert({
       parent_id: parentId,
       first_name: input.athleteFirstName,
@@ -159,7 +159,7 @@ export async function createPublicBooking(
 
   const confirmation = generateConfirmationNumber();
   const { data: booking, error: bookingError } = await supabase.rpc(
-    "ch_try_create_booking",
+    "choops_try_create_booking",
     {
       p_session_id: input.sessionId,
       p_parent_id: parentId,
@@ -229,7 +229,7 @@ export async function joinWaitlist(
 
   const supabase = createServiceClient();
   const { data: existing } = await supabase
-    .from(CH_TABLES.waitlistEntries)
+    .from(CHOOPS_TABLES.waitlistEntries)
     .select("position")
     .eq("session_id", input.sessionId)
     .eq("status", "waiting")
@@ -238,7 +238,7 @@ export async function joinWaitlist(
 
   const nextPosition = (existing?.[0]?.position ?? 0) + 1;
 
-  const { error } = await supabase.from(CH_TABLES.waitlistEntries).insert({
+  const { error } = await supabase.from(CHOOPS_TABLES.waitlistEntries).insert({
     session_id: input.sessionId,
     parent_name: input.parentName,
     athlete_name: input.athleteName,

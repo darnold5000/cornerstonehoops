@@ -4,7 +4,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import {
   FALLBACK_PROGRAMS,
   FALLBACK_REVIEWS,
@@ -34,7 +34,7 @@ async function bookingCounts(
   try {
     const supabase = createServiceClient();
     const { data } = await supabase
-      .from(CH_TABLES.bookings)
+      .from(CHOOPS_TABLES.bookings)
       .select("session_id")
       .in("session_id", sessionIds)
       .in("status", ["pending", "confirmed", "attended"]);
@@ -77,7 +77,7 @@ export async function getPrograms(): Promise<Program[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from(CH_TABLES.programs)
+      .from(CHOOPS_TABLES.programs)
       .select("*")
       .eq("active", true)
       .order("display_order");
@@ -93,7 +93,7 @@ export async function getTrainers(): Promise<Trainer[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from(CH_TABLES.trainers)
+      .from(CHOOPS_TABLES.trainers)
       .select("*")
       .eq("active", true)
       .order("display_order");
@@ -109,7 +109,7 @@ export async function getPublishedReviews(): Promise<Review[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from(CH_TABLES.reviews)
+      .from(CHOOPS_TABLES.reviews)
       .select("*")
       .eq("published", true)
       .order("display_order");
@@ -126,7 +126,7 @@ export async function getBusinessSettings(): Promise<BusinessSettings> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from(CH_TABLES.businessSettings)
+      .from(CHOOPS_TABLES.businessSettings)
       .select("*")
       .limit(1)
       .maybeSingle();
@@ -142,7 +142,7 @@ export async function getSessionTypes(): Promise<SessionType[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from(CH_TABLES.sessionTypes)
+      .from(CHOOPS_TABLES.sessionTypes)
       .select("*")
       .eq("active", true)
       .order("name");
@@ -167,7 +167,7 @@ export async function getUpcomingSessions(
     const supabase = await createClient();
     const today = todayISO();
     const { data, error } = await supabase
-      .from(CH_TABLES.sessions)
+      .from(CHOOPS_TABLES.sessions)
       .select("*")
       .eq("status", "published")
       .gte("session_date", today)
@@ -228,7 +228,7 @@ export async function getFilteredSessions(
   try {
     const supabase = await createClient();
     let query = supabase
-      .from(CH_TABLES.sessions)
+      .from(CHOOPS_TABLES.sessions)
       .select("*")
       .eq("status", "published")
       .gte("session_date", todayISO())
@@ -286,7 +286,7 @@ export async function getSessionById(
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from(CH_TABLES.sessions)
+      .from(CHOOPS_TABLES.sessions)
       .select("*")
       .eq("id", id)
       .maybeSingle();

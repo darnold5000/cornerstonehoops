@@ -6,7 +6,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import { SITE } from "@/lib/constants";
 
 const schema = z.object({
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     const supabase = createServiceClient();
     const { data: privateType } = await supabase
-      .from(CH_TABLES.sessionTypes)
+      .from(CHOOPS_TABLES.sessionTypes)
       .select("id")
       .eq("slug", "private-lesson")
       .maybeSingle();
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       created_by: auth.id,
     }));
 
-    const { error } = await supabase.from(CH_TABLES.sessions).insert(rows);
+    const { error } = await supabase.from(CHOOPS_TABLES.sessions).insert(rows);
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }

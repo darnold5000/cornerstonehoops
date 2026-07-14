@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import type { Profile } from "@/lib/types/database";
 import { isAdminRole, isOwnerRole, isStaffRole } from "@/lib/roles";
 
@@ -35,7 +35,7 @@ export async function getCurrentProfile(): Promise<Profile | null> {
   if (!user) return null;
 
   const { data } = await supabase
-    .from(CH_TABLES.profiles)
+    .from(CHOOPS_TABLES.profiles)
     .select("*")
     .eq("id", user.id)
     .eq("active", true)

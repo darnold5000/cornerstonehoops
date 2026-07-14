@@ -5,7 +5,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 
 const schema = z.object({
   id: z.string().min(1),
@@ -38,7 +38,7 @@ export async function PATCH(request: Request) {
     const { id, ...rest } = body;
     const supabase = createServiceClient();
     const { error } = await supabase
-      .from(CH_TABLES.businessSettings)
+      .from(CHOOPS_TABLES.businessSettings)
       .update(rest)
       .eq("id", id);
 

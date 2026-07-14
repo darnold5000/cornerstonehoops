@@ -5,7 +5,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 
 const schema = z.object({
   reviewer_name: z.string().min(1),
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     }
 
     const supabase = createServiceClient();
-    const { error } = await supabase.from(CH_TABLES.reviews).insert({
+    const { error } = await supabase.from(CHOOPS_TABLES.reviews).insert({
       reviewer_name: body.reviewer_name,
       reviewer_description: body.reviewer_description || null,
       athlete_sport: body.athlete_sport || null,

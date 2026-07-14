@@ -113,7 +113,7 @@ Suggested headlines (not from source; brand voice only):
 
 ## Implementation Notes
 
-- Booking now uses the first-party scheduling platform (DAWG-pattern Supabase `ch_*` tables). SignupGenius is no longer the booking destination.
+- Booking now uses the first-party scheduling platform (DAWG-pattern Supabase `choops_*` tables). SignupGenius is no longer the booking destination.
 - Historical SignupGenius facts above remain the source for initial business copy and seed sessions.
 - Testimonials section is prepared but hidden until real quotes are supplied.
 - Coach biography uses a short verified blurb only; full bio marked `TODO` in data files and not fabricated on the page.

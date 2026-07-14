@@ -1,9 +1,9 @@
--- CH Youth Training schema for the shared Dugout Intel Supabase project.
--- Creates ONLY ch_* tables, functions, triggers, and policies.
+-- Cornerstone Hoops schema for the shared Dugout Intel Supabase project.
+-- Creates ONLY choops_* tables, functions, triggers, and policies.
 
 create extension if not exists "pgcrypto";
 
-create or replace function public.ch_set_updated_at()
+create or replace function public.choops_set_updated_at()
 returns trigger
 language plpgsql
 as $$
@@ -17,7 +17,7 @@ $$;
 -- Tables
 -- ---------------------------------------------------------------------------
 
-create table if not exists public.ch_profiles (
+create table if not exists public.choops_profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text,
   email text,
@@ -28,9 +28,9 @@ create table if not exists public.ch_profiles (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.ch_trainers (
+create table if not exists public.choops_trainers (
   id uuid primary key default gen_random_uuid(),
-  profile_id uuid references public.ch_profiles(id) on delete set null,
+  profile_id uuid references public.choops_profiles(id) on delete set null,
   name text not null,
   title text,
   bio text,
@@ -45,7 +45,7 @@ create table if not exists public.ch_trainers (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.ch_programs (
+create table if not exists public.choops_programs (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   slug text not null unique,
@@ -64,18 +64,18 @@ create table if not exists public.ch_programs (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.ch_session_types (
+create table if not exists public.choops_session_types (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   slug text not null unique,
   active boolean not null default true
 );
 
-create table if not exists public.ch_sessions (
+create table if not exists public.choops_sessions (
   id uuid primary key default gen_random_uuid(),
-  program_id uuid references public.ch_programs(id) on delete set null,
-  session_type_id uuid references public.ch_session_types(id) on delete set null,
-  trainer_id uuid references public.ch_trainers(id) on delete set null,
+  program_id uuid references public.choops_programs(id) on delete set null,
+  session_type_id uuid references public.choops_session_types(id) on delete set null,
+  trainer_id uuid references public.choops_trainers(id) on delete set null,
   title text not null,
   description text,
   session_date date not null,
@@ -104,13 +104,13 @@ create table if not exists public.ch_sessions (
   updated_at timestamptz default now()
 );
 
-create index if not exists ch_sessions_date_idx on public.ch_sessions (session_date);
-create index if not exists ch_sessions_status_idx on public.ch_sessions (status);
-create index if not exists ch_sessions_public_idx
-  on public.ch_sessions (status, session_date)
+create index if not exists choops_sessions_date_idx on public.choops_sessions (session_date);
+create index if not exists choops_sessions_status_idx on public.choops_sessions (status);
+create index if not exists choops_sessions_public_idx
+  on public.choops_sessions (status, session_date)
   where status = 'published';
 
-create table if not exists public.ch_parents (
+create table if not exists public.choops_parents (
   id uuid primary key default gen_random_uuid(),
   first_name text not null,
   last_name text not null,
@@ -120,11 +120,11 @@ create table if not exists public.ch_parents (
   updated_at timestamptz default now()
 );
 
-create index if not exists ch_parents_email_idx on public.ch_parents (lower(email));
+create index if not exists choops_parents_email_idx on public.choops_parents (lower(email));
 
-create table if not exists public.ch_athletes (
+create table if not exists public.choops_athletes (
   id uuid primary key default gen_random_uuid(),
-  parent_id uuid not null references public.ch_parents(id) on delete cascade,
+  parent_id uuid not null references public.choops_parents(id) on delete cascade,
   first_name text not null,
   last_name text not null,
   date_of_birth date not null,
@@ -135,11 +135,11 @@ create table if not exists public.ch_athletes (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.ch_bookings (
+create table if not exists public.choops_bookings (
   id uuid primary key default gen_random_uuid(),
-  session_id uuid not null references public.ch_sessions(id) on delete cascade,
-  parent_id uuid not null references public.ch_parents(id) on delete restrict,
-  athlete_id uuid not null references public.ch_athletes(id) on delete restrict,
+  session_id uuid not null references public.choops_sessions(id) on delete cascade,
+  parent_id uuid not null references public.choops_parents(id) on delete restrict,
+  athlete_id uuid not null references public.choops_athletes(id) on delete restrict,
   confirmation_number text not null unique,
   status text not null default 'confirmed'
     check (status in ('pending', 'confirmed', 'cancelled', 'waitlisted', 'attended', 'no_show', 'refunded')),
@@ -159,17 +159,17 @@ create table if not exists public.ch_bookings (
   updated_at timestamptz default now()
 );
 
-create index if not exists ch_bookings_session_idx on public.ch_bookings (session_id);
-create index if not exists ch_bookings_status_idx on public.ch_bookings (status);
+create index if not exists choops_bookings_session_idx on public.choops_bookings (session_id);
+create index if not exists choops_bookings_status_idx on public.choops_bookings (status);
 
 -- Prevent duplicate active bookings for the same athlete on one session
-create unique index if not exists ch_bookings_unique_athlete_session
-  on public.ch_bookings (session_id, athlete_id)
+create unique index if not exists choops_bookings_unique_athlete_session
+  on public.choops_bookings (session_id, athlete_id)
   where status in ('pending', 'confirmed', 'attended', 'waitlisted');
 
-create table if not exists public.ch_waitlist_entries (
+create table if not exists public.choops_waitlist_entries (
   id uuid primary key default gen_random_uuid(),
-  session_id uuid not null references public.ch_sessions(id) on delete cascade,
+  session_id uuid not null references public.choops_sessions(id) on delete cascade,
   parent_name text not null,
   athlete_name text not null,
   email text not null,
@@ -181,7 +181,7 @@ create table if not exists public.ch_waitlist_entries (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.ch_reviews (
+create table if not exists public.choops_reviews (
   id uuid primary key default gen_random_uuid(),
   reviewer_name text not null,
   reviewer_description text,
@@ -195,9 +195,9 @@ create table if not exists public.ch_reviews (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.ch_business_settings (
+create table if not exists public.choops_business_settings (
   id uuid primary key default gen_random_uuid(),
-  business_name text not null default 'CH Youth Training',
+  business_name text not null default 'Cornerstone Hoops',
   phone text,
   email text,
   address_line_1 text,
@@ -214,9 +214,9 @@ create table if not exists public.ch_business_settings (
   updated_at timestamptz default now()
 );
 
-create table if not exists public.ch_blocked_times (
+create table if not exists public.choops_blocked_times (
   id uuid primary key default gen_random_uuid(),
-  trainer_id uuid references public.ch_trainers(id) on delete cascade,
+  trainer_id uuid references public.choops_trainers(id) on delete cascade,
   start_datetime timestamptz not null,
   end_datetime timestamptz not null,
   reason text,
@@ -228,7 +228,7 @@ create table if not exists public.ch_blocked_times (
 -- Capacity helper — atomic check used by service-role booking path
 -- ---------------------------------------------------------------------------
 
-create or replace function public.ch_session_booked_count(p_session_id uuid)
+create or replace function public.choops_session_booked_count(p_session_id uuid)
 returns int
 language sql
 stable
@@ -236,12 +236,12 @@ security definer
 set search_path = public
 as $$
   select count(*)::int
-  from public.ch_bookings b
+  from public.choops_bookings b
   where b.session_id = p_session_id
     and b.status in ('pending', 'confirmed', 'attended');
 $$;
 
-create or replace function public.ch_try_create_booking(
+create or replace function public.choops_try_create_booking(
   p_session_id uuid,
   p_parent_id uuid,
   p_athlete_id uuid,
@@ -252,7 +252,7 @@ create or replace function public.ch_try_create_booking(
   p_waiver_acknowledged_at timestamptz,
   p_media_consent boolean
 )
-returns public.ch_bookings
+returns public.choops_bookings
 language plpgsql
 security definer
 set search_path = public
@@ -261,10 +261,10 @@ declare
   v_capacity int;
   v_count int;
   v_status text;
-  v_booking public.ch_bookings;
+  v_booking public.choops_bookings;
 begin
   select capacity, status into v_capacity, v_status
-  from public.ch_sessions
+  from public.choops_sessions
   where id = p_session_id
   for update;
 
@@ -276,14 +276,14 @@ begin
     raise exception 'SESSION_NOT_BOOKABLE';
   end if;
 
-  select public.ch_session_booked_count(p_session_id) into v_count;
+  select public.choops_session_booked_count(p_session_id) into v_count;
 
   if v_count >= v_capacity then
-    update public.ch_sessions set status = 'full' where id = p_session_id and status = 'published';
+    update public.choops_sessions set status = 'full' where id = p_session_id and status = 'published';
     raise exception 'SESSION_FULL';
   end if;
 
-  insert into public.ch_bookings (
+  insert into public.choops_bookings (
     session_id, parent_id, athlete_id, confirmation_number, status,
     payment_status, amount_due, amount_paid, customer_notes,
     waiver_acknowledged_at, media_consent
@@ -295,7 +295,7 @@ begin
   returning * into v_booking;
 
   if v_count + 1 >= v_capacity then
-    update public.ch_sessions set status = 'full' where id = p_session_id;
+    update public.choops_sessions set status = 'full' where id = p_session_id;
   end if;
 
   return v_booking;
@@ -306,7 +306,7 @@ $$;
 -- RLS helpers
 -- ---------------------------------------------------------------------------
 
-create or replace function public.ch_is_staff()
+create or replace function public.choops_is_staff()
 returns boolean
 language sql
 stable
@@ -314,13 +314,13 @@ security definer
 set search_path = public
 as $$
   select exists (
-    select 1 from public.ch_profiles p
+    select 1 from public.choops_profiles p
     where p.id = auth.uid() and p.active = true
       and p.role in ('owner', 'admin', 'trainer')
   );
 $$;
 
-create or replace function public.ch_is_admin()
+create or replace function public.choops_is_admin()
 returns boolean
 language sql
 stable
@@ -328,13 +328,13 @@ security definer
 set search_path = public
 as $$
   select exists (
-    select 1 from public.ch_profiles p
+    select 1 from public.choops_profiles p
     where p.id = auth.uid() and p.active = true
       and p.role in ('owner', 'admin')
   );
 $$;
 
-create or replace function public.ch_is_owner()
+create or replace function public.choops_is_owner()
 returns boolean
 language sql
 stable
@@ -342,7 +342,7 @@ security definer
 set search_path = public
 as $$
   select exists (
-    select 1 from public.ch_profiles p
+    select 1 from public.choops_profiles p
     where p.id = auth.uid() and p.active = true and p.role = 'owner'
   );
 $$;
@@ -351,131 +351,131 @@ $$;
 -- Triggers
 -- ---------------------------------------------------------------------------
 
-drop trigger if exists ch_profiles_updated_at on public.ch_profiles;
-create trigger ch_profiles_updated_at before update on public.ch_profiles
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_profiles_updated_at on public.choops_profiles;
+create trigger choops_profiles_updated_at before update on public.choops_profiles
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_trainers_updated_at on public.ch_trainers;
-create trigger ch_trainers_updated_at before update on public.ch_trainers
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_trainers_updated_at on public.choops_trainers;
+create trigger choops_trainers_updated_at before update on public.choops_trainers
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_programs_updated_at on public.ch_programs;
-create trigger ch_programs_updated_at before update on public.ch_programs
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_programs_updated_at on public.choops_programs;
+create trigger choops_programs_updated_at before update on public.choops_programs
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_sessions_updated_at on public.ch_sessions;
-create trigger ch_sessions_updated_at before update on public.ch_sessions
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_sessions_updated_at on public.choops_sessions;
+create trigger choops_sessions_updated_at before update on public.choops_sessions
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_parents_updated_at on public.ch_parents;
-create trigger ch_parents_updated_at before update on public.ch_parents
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_parents_updated_at on public.choops_parents;
+create trigger choops_parents_updated_at before update on public.choops_parents
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_athletes_updated_at on public.ch_athletes;
-create trigger ch_athletes_updated_at before update on public.ch_athletes
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_athletes_updated_at on public.choops_athletes;
+create trigger choops_athletes_updated_at before update on public.choops_athletes
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_bookings_updated_at on public.ch_bookings;
-create trigger ch_bookings_updated_at before update on public.ch_bookings
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_bookings_updated_at on public.choops_bookings;
+create trigger choops_bookings_updated_at before update on public.choops_bookings
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_waitlist_updated_at on public.ch_waitlist_entries;
-create trigger ch_waitlist_updated_at before update on public.ch_waitlist_entries
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_waitlist_updated_at on public.choops_waitlist_entries;
+create trigger choops_waitlist_updated_at before update on public.choops_waitlist_entries
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_reviews_updated_at on public.ch_reviews;
-create trigger ch_reviews_updated_at before update on public.ch_reviews
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_reviews_updated_at on public.choops_reviews;
+create trigger choops_reviews_updated_at before update on public.choops_reviews
+  for each row execute procedure public.choops_set_updated_at();
 
-drop trigger if exists ch_settings_updated_at on public.ch_business_settings;
-create trigger ch_settings_updated_at before update on public.ch_business_settings
-  for each row execute procedure public.ch_set_updated_at();
+drop trigger if exists choops_settings_updated_at on public.choops_business_settings;
+create trigger choops_settings_updated_at before update on public.choops_business_settings
+  for each row execute procedure public.choops_set_updated_at();
 
 -- ---------------------------------------------------------------------------
 -- RLS
 -- ---------------------------------------------------------------------------
 
-alter table public.ch_profiles enable row level security;
-alter table public.ch_trainers enable row level security;
-alter table public.ch_programs enable row level security;
-alter table public.ch_session_types enable row level security;
-alter table public.ch_sessions enable row level security;
-alter table public.ch_parents enable row level security;
-alter table public.ch_athletes enable row level security;
-alter table public.ch_bookings enable row level security;
-alter table public.ch_waitlist_entries enable row level security;
-alter table public.ch_reviews enable row level security;
-alter table public.ch_business_settings enable row level security;
-alter table public.ch_blocked_times enable row level security;
+alter table public.choops_profiles enable row level security;
+alter table public.choops_trainers enable row level security;
+alter table public.choops_programs enable row level security;
+alter table public.choops_session_types enable row level security;
+alter table public.choops_sessions enable row level security;
+alter table public.choops_parents enable row level security;
+alter table public.choops_athletes enable row level security;
+alter table public.choops_bookings enable row level security;
+alter table public.choops_waitlist_entries enable row level security;
+alter table public.choops_reviews enable row level security;
+alter table public.choops_business_settings enable row level security;
+alter table public.choops_blocked_times enable row level security;
 
 -- profiles
-drop policy if exists "ch_read_own_profile" on public.ch_profiles;
-create policy "ch_read_own_profile" on public.ch_profiles for select using (auth.uid() = id);
-drop policy if exists "ch_admin_read_profiles" on public.ch_profiles;
-create policy "ch_admin_read_profiles" on public.ch_profiles for select using (public.ch_is_admin());
-drop policy if exists "ch_owner_manage_profiles" on public.ch_profiles;
-create policy "ch_owner_manage_profiles" on public.ch_profiles for all using (public.ch_is_owner());
+drop policy if exists "choops_read_own_profile" on public.choops_profiles;
+create policy "choops_read_own_profile" on public.choops_profiles for select using (auth.uid() = id);
+drop policy if exists "choops_admin_read_profiles" on public.choops_profiles;
+create policy "choops_admin_read_profiles" on public.choops_profiles for select using (public.choops_is_admin());
+drop policy if exists "choops_owner_manage_profiles" on public.choops_profiles;
+create policy "choops_owner_manage_profiles" on public.choops_profiles for all using (public.choops_is_owner());
 
 -- trainers (public read active)
-drop policy if exists "ch_public_read_trainers" on public.ch_trainers;
-create policy "ch_public_read_trainers" on public.ch_trainers for select using (active = true);
-drop policy if exists "ch_admin_manage_trainers" on public.ch_trainers;
-create policy "ch_admin_manage_trainers" on public.ch_trainers for all using (public.ch_is_admin());
+drop policy if exists "choops_public_read_trainers" on public.choops_trainers;
+create policy "choops_public_read_trainers" on public.choops_trainers for select using (active = true);
+drop policy if exists "choops_admin_manage_trainers" on public.choops_trainers;
+create policy "choops_admin_manage_trainers" on public.choops_trainers for all using (public.choops_is_admin());
 
 -- programs
-drop policy if exists "ch_public_read_programs" on public.ch_programs;
-create policy "ch_public_read_programs" on public.ch_programs for select using (active = true);
-drop policy if exists "ch_admin_manage_programs" on public.ch_programs;
-create policy "ch_admin_manage_programs" on public.ch_programs for all using (public.ch_is_admin());
+drop policy if exists "choops_public_read_programs" on public.choops_programs;
+create policy "choops_public_read_programs" on public.choops_programs for select using (active = true);
+drop policy if exists "choops_admin_manage_programs" on public.choops_programs;
+create policy "choops_admin_manage_programs" on public.choops_programs for all using (public.choops_is_admin());
 
 -- session types
-drop policy if exists "ch_public_read_session_types" on public.ch_session_types;
-create policy "ch_public_read_session_types" on public.ch_session_types for select using (active = true);
-drop policy if exists "ch_admin_manage_session_types" on public.ch_session_types;
-create policy "ch_admin_manage_session_types" on public.ch_session_types for all using (public.ch_is_admin());
+drop policy if exists "choops_public_read_session_types" on public.choops_session_types;
+create policy "choops_public_read_session_types" on public.choops_session_types for select using (active = true);
+drop policy if exists "choops_admin_manage_session_types" on public.choops_session_types;
+create policy "choops_admin_manage_session_types" on public.choops_session_types for all using (public.choops_is_admin());
 
 -- sessions (public: published future only)
-drop policy if exists "ch_public_read_sessions" on public.ch_sessions;
-create policy "ch_public_read_sessions" on public.ch_sessions for select
+drop policy if exists "choops_public_read_sessions" on public.choops_sessions;
+create policy "choops_public_read_sessions" on public.choops_sessions for select
   using (status = 'published' and session_date >= current_date);
-drop policy if exists "ch_staff_read_all_sessions" on public.ch_sessions;
-create policy "ch_staff_read_all_sessions" on public.ch_sessions for select using (public.ch_is_staff());
-drop policy if exists "ch_admin_manage_sessions" on public.ch_sessions;
-create policy "ch_admin_manage_sessions" on public.ch_sessions for all using (public.ch_is_admin());
+drop policy if exists "choops_staff_read_all_sessions" on public.choops_sessions;
+create policy "choops_staff_read_all_sessions" on public.choops_sessions for select using (public.choops_is_staff());
+drop policy if exists "choops_admin_manage_sessions" on public.choops_sessions;
+create policy "choops_admin_manage_sessions" on public.choops_sessions for all using (public.choops_is_admin());
 
 -- parents / athletes / bookings — staff only (public writes via service role)
-drop policy if exists "ch_staff_read_parents" on public.ch_parents;
-create policy "ch_staff_read_parents" on public.ch_parents for select using (public.ch_is_staff());
-drop policy if exists "ch_staff_manage_parents" on public.ch_parents;
-create policy "ch_staff_manage_parents" on public.ch_parents for all using (public.ch_is_staff());
+drop policy if exists "choops_staff_read_parents" on public.choops_parents;
+create policy "choops_staff_read_parents" on public.choops_parents for select using (public.choops_is_staff());
+drop policy if exists "choops_staff_manage_parents" on public.choops_parents;
+create policy "choops_staff_manage_parents" on public.choops_parents for all using (public.choops_is_staff());
 
-drop policy if exists "ch_staff_read_athletes" on public.ch_athletes;
-create policy "ch_staff_read_athletes" on public.ch_athletes for select using (public.ch_is_staff());
-drop policy if exists "ch_staff_manage_athletes" on public.ch_athletes;
-create policy "ch_staff_manage_athletes" on public.ch_athletes for all using (public.ch_is_staff());
+drop policy if exists "choops_staff_read_athletes" on public.choops_athletes;
+create policy "choops_staff_read_athletes" on public.choops_athletes for select using (public.choops_is_staff());
+drop policy if exists "choops_staff_manage_athletes" on public.choops_athletes;
+create policy "choops_staff_manage_athletes" on public.choops_athletes for all using (public.choops_is_staff());
 
-drop policy if exists "ch_staff_read_bookings" on public.ch_bookings;
-create policy "ch_staff_read_bookings" on public.ch_bookings for select using (public.ch_is_staff());
-drop policy if exists "ch_staff_manage_bookings" on public.ch_bookings;
-create policy "ch_staff_manage_bookings" on public.ch_bookings for all using (public.ch_is_staff());
+drop policy if exists "choops_staff_read_bookings" on public.choops_bookings;
+create policy "choops_staff_read_bookings" on public.choops_bookings for select using (public.choops_is_staff());
+drop policy if exists "choops_staff_manage_bookings" on public.choops_bookings;
+create policy "choops_staff_manage_bookings" on public.choops_bookings for all using (public.choops_is_staff());
 
-drop policy if exists "ch_staff_read_waitlist" on public.ch_waitlist_entries;
-create policy "ch_staff_read_waitlist" on public.ch_waitlist_entries for select using (public.ch_is_staff());
-drop policy if exists "ch_staff_manage_waitlist" on public.ch_waitlist_entries;
-create policy "ch_staff_manage_waitlist" on public.ch_waitlist_entries for all using (public.ch_is_staff());
+drop policy if exists "choops_staff_read_waitlist" on public.choops_waitlist_entries;
+create policy "choops_staff_read_waitlist" on public.choops_waitlist_entries for select using (public.choops_is_staff());
+drop policy if exists "choops_staff_manage_waitlist" on public.choops_waitlist_entries;
+create policy "choops_staff_manage_waitlist" on public.choops_waitlist_entries for all using (public.choops_is_staff());
 
 -- reviews (public published only)
-drop policy if exists "ch_public_read_reviews" on public.ch_reviews;
-create policy "ch_public_read_reviews" on public.ch_reviews for select using (published = true);
-drop policy if exists "ch_admin_manage_reviews" on public.ch_reviews;
-create policy "ch_admin_manage_reviews" on public.ch_reviews for all using (public.ch_is_admin());
+drop policy if exists "choops_public_read_reviews" on public.choops_reviews;
+create policy "choops_public_read_reviews" on public.choops_reviews for select using (published = true);
+drop policy if exists "choops_admin_manage_reviews" on public.choops_reviews;
+create policy "choops_admin_manage_reviews" on public.choops_reviews for all using (public.choops_is_admin());
 
 -- business settings
-drop policy if exists "ch_public_read_settings" on public.ch_business_settings;
-create policy "ch_public_read_settings" on public.ch_business_settings for select using (true);
-drop policy if exists "ch_admin_manage_settings" on public.ch_business_settings;
-create policy "ch_admin_manage_settings" on public.ch_business_settings for all using (public.ch_is_admin());
+drop policy if exists "choops_public_read_settings" on public.choops_business_settings;
+create policy "choops_public_read_settings" on public.choops_business_settings for select using (true);
+drop policy if exists "choops_admin_manage_settings" on public.choops_business_settings;
+create policy "choops_admin_manage_settings" on public.choops_business_settings for all using (public.choops_is_admin());
 
 -- blocked times
-drop policy if exists "ch_staff_manage_blocks" on public.ch_blocked_times;
-create policy "ch_staff_manage_blocks" on public.ch_blocked_times for all using (public.ch_is_staff());
+drop policy if exists "choops_staff_manage_blocks" on public.choops_blocked_times;
+create policy "choops_staff_manage_blocks" on public.choops_blocked_times for all using (public.choops_is_staff());

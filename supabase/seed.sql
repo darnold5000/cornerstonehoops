@@ -1,6 +1,6 @@
 -- Seed data for Cornerstone Hoops. Run after 001_initial.sql
 
-insert into public.ch_business_settings (
+insert into public.choops_business_settings (
   business_name, phone, email, address_line_1, address_line_2, city, state, postal_code,
   facebook_url, business_hours, cancellation_policy, booking_policy, map_embed_url,
   homepage_announcement
@@ -20,16 +20,16 @@ select
   'Reservations hold your athlete''s spot. Payment is $20 per session via Venmo (@sara-corbin-3) or Zelle (317-490-3263). Parent or legal guardian must book for minors. Provide your child''s name and grade when booking.',
   'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3068!2d-86.4!3d39.7!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s1915%20Gladden%20Road%2C%20Plainfield%2C%20IN!5e0!3m2!1sen!2sus!4v1',
   'NOW BOOKING • Upcoming training sessions available'
-where not exists (select 1 from public.ch_business_settings);
+where not exists (select 1 from public.choops_business_settings);
 
-insert into public.ch_session_types (name, slug)
+insert into public.choops_session_types (name, slug)
 values
   ('Group Training', 'group-training'),
   ('Clinic', 'clinic'),
   ('Camp', 'camp')
 on conflict (slug) do nothing;
 
-insert into public.ch_programs (
+insert into public.choops_programs (
   name, slug, short_description, full_description, minimum_age, maximum_age,
   default_duration_minutes, default_capacity, default_price, image_url, active, featured, display_order
 )
@@ -48,7 +48,7 @@ values
    5, 18, 60, 20, 20, '/images/cornerstone-logo.png', true, true, 3)
 on conflict (slug) do nothing;
 
-insert into public.ch_trainers (name, title, bio, photo_url, specialties, active, display_order)
+insert into public.choops_trainers (name, title, bio, photo_url, specialties, active, display_order)
 select
   'Sara Corbin',
   'Trainer & Organizer',
@@ -57,10 +57,10 @@ select
   array['Basketball Fundamentals', 'Youth Development', 'Confidence Building'],
   true,
   1
-where not exists (select 1 from public.ch_trainers where name = 'Sara Corbin');
+where not exists (select 1 from public.choops_trainers where name = 'Sara Corbin');
 
 -- Starter sessions (relative to when seed is run)
-insert into public.ch_sessions (
+insert into public.choops_sessions (
   program_id, session_type_id, trainer_id, title, description,
   session_date, start_time, end_time, minimum_age, maximum_age, skill_level,
   capacity, price, payment_requirement, location_name, location_address,
@@ -79,16 +79,16 @@ select
   'Arrive 10 minutes early. Athletic shoes, water bottle, and comfortable basketball clothes.',
   'Please contact Cornerstone Hoops if you need to change a registration.',
   'published', now()
-from public.ch_programs p
-cross join public.ch_session_types st
-cross join public.ch_trainers t
+from public.choops_programs p
+cross join public.choops_session_types st
+cross join public.choops_trainers t
 where p.slug = 'grades-k-4' and st.slug = 'group-training' and t.name = 'Sara Corbin'
   and not exists (
-    select 1 from public.ch_sessions s
+    select 1 from public.choops_sessions s
     where s.title = 'Grades K–4 Training' and s.session_date = current_date + 1
   );
 
-insert into public.ch_sessions (
+insert into public.choops_sessions (
   program_id, session_type_id, trainer_id, title, description,
   session_date, start_time, end_time, minimum_age, maximum_age, skill_level,
   capacity, price, payment_requirement, location_name, location_address,
@@ -107,11 +107,11 @@ select
   'Arrive 10 minutes early. Athletic shoes, water bottle, and comfortable basketball clothes.',
   'Please contact Cornerstone Hoops if you need to change a registration.',
   'published', now()
-from public.ch_programs p
-cross join public.ch_session_types st
-cross join public.ch_trainers t
+from public.choops_programs p
+cross join public.choops_session_types st
+cross join public.choops_trainers t
 where p.slug = 'grades-5-12' and st.slug = 'group-training' and t.name = 'Sara Corbin'
   and not exists (
-    select 1 from public.ch_sessions s
+    select 1 from public.choops_sessions s
     where s.title = 'Grades 5–12 Training' and s.session_date = current_date + 1
   );

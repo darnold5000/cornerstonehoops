@@ -6,7 +6,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import type { Review } from "@/lib/types/database";
 
 export default async function AdminReviewsPage() {
@@ -17,7 +17,7 @@ export default async function AdminReviewsPage() {
     try {
       const supabase = createServiceClient();
       const { data } = await supabase
-        .from(CH_TABLES.reviews)
+        .from(CHOOPS_TABLES.reviews)
         .select("*")
         .order("display_order");
       reviews = (data as Review[]) ?? [];

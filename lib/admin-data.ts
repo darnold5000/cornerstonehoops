@@ -4,7 +4,7 @@ import {
   createServiceClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
-import { CH_TABLES } from "@/lib/supabase/tables";
+import { CHOOPS_TABLES } from "@/lib/supabase/tables";
 import { FALLBACK_SESSIONS } from "@/lib/fallback-data";
 import type {
   BookingWithRelations,
@@ -21,7 +21,7 @@ export async function getAdminSessions(): Promise<SessionWithRelations[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from(CH_TABLES.sessions)
+      .from(CHOOPS_TABLES.sessions)
       .select("*")
       .order("session_date", { ascending: true })
       .order("start_time", { ascending: true });
@@ -31,7 +31,7 @@ export async function getAdminSessions(): Promise<SessionWithRelations[]> {
     const supabaseService = createServiceClient();
     const ids = data.map((s) => s.id);
     const { data: bookings } = await supabaseService
-      .from(CH_TABLES.bookings)
+      .from(CHOOPS_TABLES.bookings)
       .select("session_id")
       .in("session_id", ids)
       .in("status", ["pending", "confirmed", "attended"]);
@@ -115,7 +115,7 @@ export async function getSessionRoster(
   try {
     const supabase = createServiceClient();
     const { data } = await supabase
-      .from(CH_TABLES.bookings)
+      .from(CHOOPS_TABLES.bookings)
       .select("*")
       .eq("session_id", sessionId)
       .order("booked_at");
@@ -125,8 +125,8 @@ export async function getSessionRoster(
     const athleteIds = [...new Set(bookings.map((b) => b.athlete_id))];
 
     const [{ data: parents }, { data: athletes }] = await Promise.all([
-      supabase.from(CH_TABLES.parents).select("*").in("id", parentIds),
-      supabase.from(CH_TABLES.athletes).select("*").in("id", athleteIds),
+      supabase.from(CHOOPS_TABLES.parents).select("*").in("id", parentIds),
+      supabase.from(CHOOPS_TABLES.athletes).select("*").in("id", athleteIds),
     ]);
 
     const enriched = bookings.map((b) => ({
