@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import { Barlow_Condensed, Manrope } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteChrome } from "@/components/site-chrome";
