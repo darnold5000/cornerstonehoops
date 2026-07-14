@@ -84,8 +84,8 @@ export function AdminShell({
                 className={cn(
                   "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap",
                   active
-                    ? "bg-ink text-primary-foreground"
-                    : "bg-muted hover:bg-muted/80",
+                    ? "bg-brand-dark text-white"
+                    : "bg-muted text-foreground hover:bg-muted/80",
                 )}
               >
                 <item.icon className="h-4 w-4" />
